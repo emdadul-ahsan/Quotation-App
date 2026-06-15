@@ -47,3 +47,11 @@ Build **MyDesk · Invoicing** as a single-page React app (hash routing + localSt
 - Added recurring generation history table + navigation to generated invoice detail
 - Added quick links from Invoices and Invoice Detail into recurring workflow
 - Fixed recurring select hydration warning by using option `label` text values
+
+
+## Update: Slack-style Light Theme System
+- Applied app-wide Slack-inspired light visual language using provided plum/cream token direction
+- Replaced global stylesheet with full tokenized system (colors, typography, spacing, radii, shadows)
+- Updated shell and all major surfaces/components: sidebar, topbar, cards, tables, pills, forms, modals, toasts, banners, charts, recurring templates
+- Preserved all existing business flows/routes while changing only presentation
+- Added readability polish for muted text and extra safe bottom spacing to avoid floating badge overlap

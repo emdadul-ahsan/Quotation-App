@@ -201,7 +201,7 @@
 }
 
 .main-content {
-    padding: 24px 28px 40px;
+    padding: 24px 28px 96px;
     min-width: 0;
 }
 
@@ -250,7 +250,7 @@ h3 {
 }
 
 .muted {
-    color: var(--color-steel);
+    color: #5b5660;
 }
 
 .tiny {
@@ -262,6 +262,11 @@ h3 {
 .small {
     font-size: 14px;
     line-height: 1.5;
+}
+
+.small.muted,
+.tiny.muted {
+    color: #534e57;
 }
 
 .semibold {
@@ -1121,6 +1126,7 @@ h3 {
     gap: 8px;
     z-index: 60;
     align-items: flex-end;
+    pointer-events: none;
 }
 
 .toast {
@@ -1135,6 +1141,7 @@ h3 {
     gap: 8px;
     min-width: 220px;
     box-shadow: var(--shadow-lg);
+    pointer-events: auto;
 }
 
 .toast-dot {
@@ -1207,7 +1214,7 @@ code {
     }
 
     .main-content {
-        padding: 16px;
+        padding: 16px 16px 96px;
     }
 
     .topbar {
