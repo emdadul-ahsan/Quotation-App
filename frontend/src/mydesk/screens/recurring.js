@@ -106,11 +106,8 @@ export const RecurringScreen = ({ onNav, search }) => {
               <option value="">Choose invoice</option>
               {candidateInvoices.map((invoice) => {
                 const client = store.getClient(invoice.clientId);
-                return (
-                  <option key={invoice.id} value={invoice.id}>
-                    {invoice.number} · {client?.name || "Unlinked"} · {invoice.project}
-                  </option>
-                );
+                const label = `${invoice.number} · ${client?.name || "Unlinked"} · ${invoice.project}`;
+                return <option key={invoice.id} value={invoice.id} label={label} />;
               })}
             </select>
           </label>

@@ -38,3 +38,12 @@ Build **MyDesk · Invoicing** as a single-page React app (hash routing + localSt
 1. Add bulk select + batch actions to invoices table
 2. Add tax/discount fields and totals logic in editor/detail/PDF
 3. Add recurring invoice generator with cadence controls
+
+
+## Update: Recurring Invoices (Monthly)
+- Added dedicated route and screen: `#/recurring`
+- Added recurring template model and persistence in store (`recurringTemplates`)
+- Added actions: create template from invoice, run now, pause/resume, edit, delete
+- Added recurring generation history table + navigation to generated invoice detail
+- Added quick links from Invoices and Invoice Detail into recurring workflow
+- Fixed recurring select hydration warning by using option `label` text values
