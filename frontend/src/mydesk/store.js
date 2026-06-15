@@ -456,15 +456,14 @@ export const StoreProvider = ({ children }) => {
     [state.invoices],
   );
 
-  const createInvoice = useCallback((draft) => {
-    let created = null;
-    setState((prev) => {
-      const num = prev.nextInvoiceNum;
+  const createInvoice = useCallback(
+    (draft) => {
+      const num = state.nextInvoiceNum;
       const number = `INV-${String(num).padStart(4, "0")}`;
       const id = `inv-${String(num).padStart(4, "0")}`;
       const issued = draft.issued || todayDate();
       const status = draft.status || "draft";
-      const newInvoice = {
+      const created = {
         id,
         number,
         clientId: draft.clientId || null,
@@ -496,7 +495,7 @@ export const StoreProvider = ({ children }) => {
       };
 
       if (status === "pending") {
-        newInvoice.activity.push({
+        created.activity.push({
           id: uid("a"),
           type: "sent",
           when: issued,
@@ -504,15 +503,16 @@ export const StoreProvider = ({ children }) => {
         });
       }
 
-      created = newInvoice;
-      return {
+      setState((prev) => ({
         ...prev,
-        invoices: [newInvoice, ...prev.invoices],
-        nextInvoiceNum: num + 1,
-      };
-    });
-    return created;
-  }, []);
+        invoices: [created, ...prev.invoices],
+        nextInvoiceNum: prev.nextInvoiceNum + 1,
+      }));
+
+      return created;
+    },
+    [state.nextInvoiceNum],
+  );
 
   const updateInvoice = useCallback((id, patch) => {
     const normalizedPatch = { ...patch };
@@ -691,79 +691,75 @@ export const StoreProvider = ({ children }) => {
 
   const invoiceMilestone = useCallback(
     (projectId, milestoneId) => {
-      let created = null;
-      setState((prev) => {
-        const project = prev.projects.find((item) => item.id === projectId);
-        if (!project) {
-          return prev;
-        }
-        const milestone = project.milestones.find((item) => item.id === milestoneId);
-        if (!milestone || milestone.status !== "done" || milestone.invoiceId) {
-          return prev;
-        }
-
-        const num = prev.nextInvoiceNum;
-        const number = `INV-${String(num).padStart(4, "0")}`;
-        const id = `inv-${String(num).padStart(4, "0")}`;
-        const issued = todayDate();
-
-        created = {
-          id,
-          number,
-          clientId: project.clientId,
-          project: `${project.name} · ${milestone.title}`,
-          issued,
-          due: daysFromNow(14),
-          status: "pending",
-          items: [
-            {
-              id: uid("l"),
-              desc: `Milestone · ${milestone.title}`,
-              qty: 1,
-              rate: Number(milestone.amount || 0),
-            },
-          ],
-          notes: `Milestone invoice generated from ${project.name}.`,
-          activity: [
-            {
-              id: uid("a"),
-              type: "created",
-              when: issued,
-              note: `Invoice ${number} created`,
-            },
-            {
-              id: uid("a"),
-              type: "sent",
-              when: issued,
-              note: `Invoice ${number} sent`,
-            },
-          ],
-        };
-
-        return {
-          ...prev,
-          invoices: [created, ...prev.invoices],
-          nextInvoiceNum: num + 1,
-          projects: prev.projects.map((item) => {
-            if (item.id !== projectId) {
-              return item;
-            }
-            return {
-              ...item,
-              milestones: item.milestones.map((entry) =>
-                entry.id === milestoneId ? { ...entry, invoiceId: id } : entry,
-              ),
-            };
-          }),
-        };
-      });
-
-      if (created) {
-        toast(`Milestone invoiced as ${created.number}`, "ok");
+      const project = state.projects.find((item) => item.id === projectId);
+      if (!project) {
+        return null;
       }
+
+      const milestone = project.milestones.find((item) => item.id === milestoneId);
+      if (!milestone || milestone.status !== "done" || milestone.invoiceId) {
+        return null;
+      }
+
+      const num = state.nextInvoiceNum;
+      const number = `INV-${String(num).padStart(4, "0")}`;
+      const id = `inv-${String(num).padStart(4, "0")}`;
+      const issued = todayDate();
+
+      const created = {
+        id,
+        number,
+        clientId: project.clientId,
+        project: `${project.name} · ${milestone.title}`,
+        issued,
+        due: daysFromNow(14),
+        status: "pending",
+        items: [
+          {
+            id: uid("l"),
+            desc: `Milestone · ${milestone.title}`,
+            qty: 1,
+            rate: Number(milestone.amount || 0),
+          },
+        ],
+        notes: `Milestone invoice generated from ${project.name}.`,
+        activity: [
+          {
+            id: uid("a"),
+            type: "created",
+            when: issued,
+            note: `Invoice ${number} created`,
+          },
+          {
+            id: uid("a"),
+            type: "sent",
+            when: issued,
+            note: `Invoice ${number} sent`,
+          },
+        ],
+      };
+
+      setState((prev) => ({
+        ...prev,
+        invoices: [created, ...prev.invoices],
+        nextInvoiceNum: prev.nextInvoiceNum + 1,
+        projects: prev.projects.map((item) => {
+          if (item.id !== projectId) {
+            return item;
+          }
+          return {
+            ...item,
+            milestones: item.milestones.map((entry) =>
+              entry.id === milestoneId ? { ...entry, invoiceId: created.id } : entry,
+            ),
+          };
+        }),
+      }));
+
+      toast(`Milestone invoiced as ${created.number}`, "ok");
       return created;
     },
-    [toast],
+    [state.nextInvoiceNum, state.projects, toast],
   );
 
   const createClient = useCallback(

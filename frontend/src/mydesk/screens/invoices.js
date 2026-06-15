@@ -139,7 +139,7 @@ export const InvoicesScreen = ({ onNav, search }) => {
                       <StatusPill status={invoice.status} testId={`invoice-status-${invoice.id}`} />
                     </td>
                     <td>
-                      <div className="row-end">
+                      <div className="row-end menu-anchor">
                         <button
                           className="icon-btn"
                           onClick={() => setRowMenu(rowMenu === invoice.id ? null : invoice.id)}

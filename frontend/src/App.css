@@ -248,7 +248,7 @@ h3 {
 
 .card.flush {
     padding: 0;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .kpi {
@@ -339,6 +339,10 @@ h3 {
     align-items: center;
 }
 
+.menu-anchor {
+    position: relative;
+}
+
 .between {
     justify-content: space-between;
 }
@@ -360,15 +364,17 @@ h3 {
 }
 
 .tiny {
-    font-size: 0.75rem;
+    font-size: 0.76rem;
+    line-height: 1.35;
 }
 
 .small {
-    font-size: 0.85rem;
+    font-size: 0.88rem;
+    line-height: 1.42;
 }
 
 .muted {
-    color: var(--storm-cloud);
+    color: #a8b0be;
 }
 
 .mono {
@@ -408,6 +414,7 @@ h3 {
     align-items: center;
     gap: 8px;
     cursor: pointer;
+    white-space: nowrap;
     transition: background-color 180ms ease, transform 180ms ease, border-color 180ms ease;
 }
 
@@ -563,6 +570,10 @@ select.input {
     vertical-align: middle;
 }
 
+.table td {
+    line-height: 1.35;
+}
+
 .table th {
     color: var(--storm-cloud);
     font-size: 0.76rem;
@@ -587,7 +598,7 @@ select.input {
 .row-menu {
     position: absolute;
     right: 0;
-    top: 38px;
+    top: calc(100% + 6px);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 10px;
     background: #1b1d21;
@@ -596,7 +607,7 @@ select.input {
     display: flex;
     flex-direction: column;
     min-width: 150px;
-    z-index: 4;
+    z-index: 30;
 }
 
 .row-menu button {
@@ -930,7 +941,7 @@ select.input {
     padding: 10px;
     display: grid;
     grid-template-columns: 34px minmax(0, 1fr) auto;
-    align-items: center;
+    align-items: start;
     gap: 10px;
 }
 
@@ -940,10 +951,34 @@ select.input {
 
 .milestone-actions {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
     flex-wrap: wrap;
     justify-content: flex-end;
+}
+
+.milestone-main .semibold {
+    line-height: 1.32;
+}
+
+.milestone-main .tiny {
+    margin-top: 3px;
+}
+
+.project-card .client-cell {
+    align-items: flex-start;
+}
+
+.project-card .semibold {
+    line-height: 1.3;
+}
+
+.project-card .tiny {
+    margin-top: 3px;
+}
+
+.three-stats strong {
+    margin-top: 2px;
 }
 
 .checkbox {
@@ -1058,6 +1093,7 @@ select.input {
     flex-direction: column;
     gap: 8px;
     z-index: 45;
+    align-items: flex-end;
 }
 
 .toast {
@@ -1117,6 +1153,16 @@ code {
 
     .sticky {
         position: static;
+    }
+
+    .milestone-row {
+        grid-template-columns: 34px minmax(0, 1fr);
+        row-gap: 8px;
+    }
+
+    .milestone-actions {
+        grid-column: 2;
+        justify-content: flex-start;
     }
 }
 
