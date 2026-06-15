@@ -8,6 +8,7 @@ import { InvoiceEditorScreen } from "./screens/invoice-editor";
 import { ClientsScreen } from "./screens/clients";
 import { ProjectsScreen, ProjectDetailScreen } from "./screens/projects";
 import { SettingsScreen } from "./screens/settings";
+import { RecurringScreen } from "./screens/recurring";
 
 const parseHash = () => {
   const hash = window.location.hash.replace(/^#\/?/, "");
@@ -27,7 +28,7 @@ const parseHash = () => {
   if (routeName === "project-detail") {
     return { route: "project-detail", id: id || null };
   }
-  if (["dashboard", "invoices", "projects", "clients", "settings"].includes(routeName)) {
+  if (["dashboard", "invoices", "projects", "clients", "settings", "recurring"].includes(routeName)) {
     return { route: routeName, id: null };
   }
   return { route: "dashboard", id: null };
@@ -105,6 +106,7 @@ const Shell = () => {
     const map = {
       dashboard: "Dashboard",
       invoices: "Invoices",
+      recurring: "Recurring",
       projects: "Projects",
       clients: "Clients",
       settings: "Settings",
@@ -136,6 +138,9 @@ const Shell = () => {
   if (location.route === "settings") {
     content = <SettingsScreen />;
   }
+  if (location.route === "recurring") {
+    content = <RecurringScreen {...screenProps} />;
+  }
 
   return (
     <div className="mydesk-app" data-testid="mydesk-root">
@@ -144,6 +149,7 @@ const Shell = () => {
         onNav={onNav}
         counts={{
           invoices: store.invoices.length,
+          recurring: (store.recurringTemplates || []).length,
           projects: store.projects.length,
           clients: store.clients.length,
         }}

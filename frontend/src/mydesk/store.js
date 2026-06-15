@@ -28,6 +28,23 @@ export const daysAgo = (days) => {
   return isoDate(date);
 };
 
+export const addDaysIso = (value, days) => {
+  const date = new Date(`${value}T00:00:00`);
+  date.setDate(date.getDate() + Number(days || 0));
+  return isoDate(date);
+};
+
+export const addMonthsIso = (value, months) => {
+  const source = new Date(`${value}T00:00:00`);
+  const year = source.getFullYear();
+  const month = source.getMonth();
+  const day = source.getDate();
+  const targetMonthDate = new Date(year, month + Number(months || 0) + 1, 0);
+  const lastDay = targetMonthDate.getDate();
+  const result = new Date(year, month + Number(months || 0), Math.min(day, lastDay));
+  return isoDate(result);
+};
+
 const fromIso = (value) => new Date(`${value}T00:00:00`);
 
 export const daysBetween = (dateA, dateB) => {
@@ -326,8 +343,114 @@ const seedState = () => ({
       ],
     },
   ],
+  recurringTemplates: [
+    {
+      id: "rt-1",
+      sourceInvoiceId: "inv-0143",
+      sourceNumber: "INV-0143",
+      clientId: "c2",
+      project: "Monthly product design retainer",
+      intervalMonths: 1,
+      statusOnGenerate: "draft",
+      startDate: daysAgo(12),
+      nextRunAt: addMonthsIso(daysAgo(12), 1),
+      dueOffsetDays: 16,
+      active: true,
+      lastGeneratedOn: "",
+      notes: "Due on receipt. Late fee of 2% after due date.",
+      items: [{ id: "rt-l1", desc: "Retainer · Monthly cycle", qty: 1, rate: 3200 }],
+      createdAt: daysAgo(12),
+    },
+  ],
   nextInvoiceNum: 147,
 });
+
+const buildRecurringInvoice = (template, num, issueDate) => {
+  const number = `INV-${String(num).padStart(4, "0")}`;
+  const id = `inv-${String(num).padStart(4, "0")}`;
+  const status = template.statusOnGenerate || "draft";
+  const due = addDaysIso(issueDate, Number(template.dueOffsetDays || 14));
+  const invoice = {
+    id,
+    number,
+    clientId: template.clientId || null,
+    project: template.project || "Recurring invoice",
+    issued: issueDate,
+    due,
+    status,
+    recurringTemplateId: template.id,
+    paidOn: undefined,
+    method: undefined,
+    ref: undefined,
+    items: (template.items || []).map((item) => ({
+      id: uid("l"),
+      desc: item.desc || "Recurring service",
+      qty: Number(item.qty || 0),
+      rate: Number(item.rate || 0),
+    })),
+    notes: template.notes || "",
+    activity: [
+      {
+        id: uid("a"),
+        type: "created",
+        when: issueDate,
+        note: `Invoice ${number} created from recurring template`,
+      },
+    ],
+  };
+
+  if (status === "pending") {
+    invoice.activity.push({
+      id: uid("a"),
+      type: "sent",
+      when: issueDate,
+      note: `Invoice ${number} sent`,
+    });
+  }
+
+  return invoice;
+};
+
+const applyRecurringGeneration = (state, runDate = todayDate()) => {
+  let nextInvoiceNum = Number(state.nextInvoiceNum || 1);
+  const generated = [];
+
+  const templates = (state.recurringTemplates || []).map((template) => {
+    if (!template.active || !template.nextRunAt) {
+      return template;
+    }
+
+    const nextTemplate = { ...template };
+    let guard = 0;
+    while (nextTemplate.nextRunAt <= runDate && guard < 60) {
+      const invoice = buildRecurringInvoice(nextTemplate, nextInvoiceNum, nextTemplate.nextRunAt);
+      generated.push(invoice);
+      nextInvoiceNum += 1;
+      nextTemplate.lastGeneratedOn = nextTemplate.nextRunAt;
+      nextTemplate.nextRunAt = addMonthsIso(
+        nextTemplate.nextRunAt,
+        Number(nextTemplate.intervalMonths || 1),
+      );
+      guard += 1;
+    }
+    return nextTemplate;
+  });
+
+  if (generated.length === 0) {
+    return { state, generatedCount: 0, generatedInvoices: [] };
+  }
+
+  return {
+    state: {
+      ...state,
+      recurringTemplates: templates,
+      invoices: [...generated, ...state.invoices],
+      nextInvoiceNum,
+    },
+    generatedCount: generated.length,
+    generatedInvoices: generated,
+  };
+};
 
 const refreshOverdue = (state) => {
   const today = todayDate();
@@ -347,24 +470,35 @@ const loadState = () => {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      return { ...refreshOverdue(fallback), toasts: [] };
+      const refreshed = refreshOverdue(fallback);
+      const applied = applyRecurringGeneration(refreshed);
+      return { ...applied.state, toasts: [] };
     }
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.invoices) || !Array.isArray(parsed.clients)) {
-      return { ...refreshOverdue(fallback), toasts: [] };
+      const refreshed = refreshOverdue(fallback);
+      const applied = applyRecurringGeneration(refreshed);
+      return { ...applied.state, toasts: [] };
     }
+    const recurringTemplates = Array.isArray(parsed.recurringTemplates)
+      ? parsed.recurringTemplates
+      : fallback.recurringTemplates;
+
     return {
-      ...refreshOverdue({
+      ...applyRecurringGeneration(refreshOverdue({
         business: parsed.business || fallback.business,
         clients: parsed.clients || fallback.clients,
         invoices: parsed.invoices || fallback.invoices,
         projects: parsed.projects || fallback.projects,
+        recurringTemplates,
         nextInvoiceNum: parsed.nextInvoiceNum || fallback.nextInvoiceNum,
-      }),
+      })).state,
       toasts: [],
     };
   } catch (_error) {
-    return { ...refreshOverdue(fallback), toasts: [] };
+    const refreshed = refreshOverdue(fallback);
+    const applied = applyRecurringGeneration(refreshed);
+    return { ...applied.state, toasts: [] };
   }
 };
 
@@ -377,6 +511,7 @@ export const StoreProvider = ({ children }) => {
       clients: state.clients,
       invoices: state.invoices,
       projects: state.projects,
+      recurringTemplates: state.recurringTemplates,
       nextInvoiceNum: state.nextInvoiceNum,
     };
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(persistable));
@@ -385,6 +520,7 @@ export const StoreProvider = ({ children }) => {
     state.clients,
     state.invoices,
     state.projects,
+    state.recurringTemplates,
     state.nextInvoiceNum,
   ]);
 
@@ -530,6 +666,122 @@ export const StoreProvider = ({ children }) => {
       ),
     }));
   }, []);
+
+  const createRecurringTemplate = useCallback(
+    (invoiceId, options = {}) => {
+      const source = state.invoices.find((item) => item.id === invoiceId);
+      if (!source) {
+        return null;
+      }
+
+      const template = {
+        id: uid("rt"),
+        sourceInvoiceId: source.id,
+        sourceNumber: source.number,
+        clientId: source.clientId || null,
+        project: source.project,
+        intervalMonths: 1,
+        statusOnGenerate: options.statusOnGenerate || "draft",
+        startDate: options.startDate || source.issued || todayDate(),
+        nextRunAt: options.nextRunAt || addMonthsIso(options.startDate || source.issued || todayDate(), 1),
+        dueOffsetDays:
+          options.dueOffsetDays !== undefined
+            ? Number(options.dueOffsetDays)
+            : Math.max(daysBetween(source.due, source.issued), 1),
+        active: true,
+        lastGeneratedOn: "",
+        notes: source.notes || "",
+        items: (source.items || []).map((item) => ({
+          id: uid("rtl"),
+          desc: item.desc || "",
+          qty: Number(item.qty || 0),
+          rate: Number(item.rate || 0),
+        })),
+        createdAt: todayDate(),
+      };
+
+      setState((prev) => ({
+        ...prev,
+        recurringTemplates: [template, ...(prev.recurringTemplates || [])],
+      }));
+      toast(`Recurring monthly template created from ${source.number}`, "ok");
+      return template;
+    },
+    [state.invoices, toast],
+  );
+
+  const toggleRecurringTemplate = useCallback(
+    (templateId) => {
+      setState((prev) => ({
+        ...prev,
+        recurringTemplates: (prev.recurringTemplates || []).map((template) =>
+          template.id === templateId ? { ...template, active: !template.active } : template,
+        ),
+      }));
+      toast("Recurring template updated", "info");
+    },
+    [toast],
+  );
+
+  const updateRecurringTemplate = useCallback(
+    (templateId, patch) => {
+      setState((prev) => ({
+        ...prev,
+        recurringTemplates: (prev.recurringTemplates || []).map((template) =>
+          template.id === templateId ? { ...template, ...patch } : template,
+        ),
+      }));
+      toast("Recurring template updated", "info");
+    },
+    [toast],
+  );
+
+  const deleteRecurringTemplate = useCallback(
+    (templateId) => {
+      setState((prev) => ({
+        ...prev,
+        recurringTemplates: (prev.recurringTemplates || []).filter(
+          (template) => template.id !== templateId,
+        ),
+      }));
+      toast("Recurring template deleted", "warn");
+    },
+    [toast],
+  );
+
+  const runRecurringNow = useCallback(
+    (templateId) => {
+      const template = (state.recurringTemplates || []).find((item) => item.id === templateId);
+      if (!template) {
+        return null;
+      }
+
+      const num = state.nextInvoiceNum;
+      const issueDate = todayDate();
+      const generated = buildRecurringInvoice(template, num, issueDate);
+
+      setState((prev) => ({
+        ...prev,
+        invoices: [generated, ...prev.invoices],
+        nextInvoiceNum: prev.nextInvoiceNum + 1,
+        recurringTemplates: (prev.recurringTemplates || []).map((entry) => {
+          if (entry.id !== templateId) {
+            return entry;
+          }
+          const base = entry.nextRunAt && entry.nextRunAt > issueDate ? entry.nextRunAt : issueDate;
+          return {
+            ...entry,
+            lastGeneratedOn: issueDate,
+            nextRunAt: addMonthsIso(base, Number(entry.intervalMonths || 1)),
+          };
+        }),
+      }));
+
+      toast(`Recurring invoice ${generated.number} generated`, "ok");
+      return generated;
+    },
+    [state.nextInvoiceNum, state.recurringTemplates, toast],
+  );
 
   const deleteInvoice = useCallback(
     (id) => {
@@ -844,6 +1096,11 @@ export const StoreProvider = ({ children }) => {
       markPaid,
       sendReminder,
       duplicateInvoice,
+      createRecurringTemplate,
+      toggleRecurringTemplate,
+      updateRecurringTemplate,
+      deleteRecurringTemplate,
+      runRecurringNow,
       updateProject,
       toggleMilestone,
       invoiceMilestone,
@@ -870,6 +1127,11 @@ export const StoreProvider = ({ children }) => {
       markPaid,
       sendReminder,
       duplicateInvoice,
+      createRecurringTemplate,
+      toggleRecurringTemplate,
+      updateRecurringTemplate,
+      deleteRecurringTemplate,
+      runRecurringNow,
       updateProject,
       toggleMilestone,
       invoiceMilestone,

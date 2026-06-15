@@ -65,6 +65,15 @@ export const InvoiceDetailScreen = ({ id, onNav }) => {
         <div className="row gap-8">
           <button
             className="btn ghost"
+            onClick={() => onNav("recurring")}
+            data-testid="invoice-detail-recurring-link-button"
+          >
+            <Icon name="calendar" size={14} />
+            Recurring
+          </button>
+
+          <button
+            className="btn ghost"
             onClick={() => downloadInvoice(invoice, client, store.business, store.invoiceTotal)}
             data-testid="invoice-detail-download-button"
           >
@@ -79,6 +88,15 @@ export const InvoiceDetailScreen = ({ id, onNav }) => {
           )}
           <button className="btn danger" onClick={() => setShowDeleteModal(true)} data-testid="invoice-detail-delete-button">
             Delete
+          </button>
+
+          <button
+            className="btn"
+            onClick={() => store.createRecurringTemplate(invoice.id)}
+            data-testid="invoice-detail-create-recurring-button"
+          >
+            <Icon name="calendar" size={14} />
+            Make recurring
           </button>
         </div>
       </div>

@@ -99,6 +99,7 @@ export const Sidebar = ({ route, onNav, counts }) => {
   const items = [
     { id: "dashboard", label: "Dashboard", icon: "dashboard" },
     { id: "invoices", label: "Invoices", icon: "invoice", count: counts?.invoices },
+    { id: "recurring", label: "Recurring", icon: "calendar", count: counts?.recurring },
     { id: "projects", label: "Projects", icon: "project", count: counts?.projects },
     { id: "clients", label: "Clients", icon: "client", count: counts?.clients },
     { id: "settings", label: "Settings", icon: "settings" },

@@ -49,10 +49,20 @@ export const InvoicesScreen = ({ onNav, search }) => {
           <h1 className="page-title">Invoices</h1>
           <p className="muted">Track every bill from draft to paid.</p>
         </div>
-        <button className="btn violet" onClick={() => onNav("editor")} data-testid="invoices-new-button">
-          <Icon name="plus" size={15} />
-          New invoice
-        </button>
+        <div className="row gap-8">
+          <button
+            className="btn ghost"
+            onClick={() => onNav("recurring")}
+            data-testid="invoices-recurring-link-button"
+          >
+            <Icon name="calendar" size={14} />
+            Recurring
+          </button>
+          <button className="btn violet" onClick={() => onNav("editor")} data-testid="invoices-new-button">
+            <Icon name="plus" size={15} />
+            New invoice
+          </button>
+        </div>
       </div>
 
       <div className="card flush" data-testid="invoices-table-card">
