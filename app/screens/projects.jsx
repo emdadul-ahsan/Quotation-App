@@ -54,7 +54,7 @@ function ProjectDetailScreen({ onNav, params }) {
         </div>
       </div>
 
-      <div className="grid" style={{ gridTemplateColumns: "1.5fr 1fr" }}>
+      <div className="grid grid-asym">
         <div className="col gap-16">
           <div className="card">
             <div className="spread mb-16">

@@ -78,7 +78,7 @@ function AuthProvider({ children }) {
 }
 
 /* ---------- Login screen ---------- */
-function LoginScreen() {
+function LoginScreen({ onBack }) {
   const { signIn, signInFirebaseGoogle } = useAuth();
   const gisRef = React.useRef(null);
   const fb = !!(window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey);
@@ -116,6 +116,7 @@ function LoginScreen() {
   return (
     <div className="auth-wrap">
       <div className="auth-card">
+        {onBack && <button className="auth-back" onClick={onBack}><Icon name="back" size={14} /> Back</button>}
         <div className="auth-brand">
           <div className="logo">M</div>
           <div className="name">MyDesk <span>· Invoicing</span></div>

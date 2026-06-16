@@ -143,7 +143,7 @@ function ClientsScreen({ onNav }) {
 function SettingsScreen() {
   const store = useStore();
   const { account, signOut } = useAuth();
-  const { business, updateBusiness, addPaymentMethod, removePaymentMethod, resetData } = store;
+  const { business, updateBusiness, addPaymentMethod, removePaymentMethod, resetData, loadDemo } = store;
   const [form, setForm] = useState({ ...business });
   const [reset, setReset] = useState(false);
   const [newMethod, setNewMethod] = useState("");
@@ -160,7 +160,7 @@ function SettingsScreen() {
   return (
     <div className="screen">
       <div className="page-head"><div><h1>Settings</h1><div className="sub">Business profile &amp; data.</div></div></div>
-      <div className="grid" style={{ gridTemplateColumns: "1.4fr 1fr" }}>
+      <div className="grid grid-asym">
         <div className="card">
           <div className="card-head"><h3>Business info</h3></div>
           <div className="logo-up mb-24">
@@ -220,19 +220,22 @@ function SettingsScreen() {
 
           <div className="card">
             <div className="card-head"><h3>Data</h3></div>
-            <div className="muted small mb-16">All data lives in your browser, scoped to your account. Nothing is sent to a server. Reset to restore the original seed data.</div>
-            <button className="btn danger" onClick={() => setReset(true)}><Icon name="trash" size={14} /> Reset demo data</button>
+            <div className="muted small mb-16">All data lives in your browser, scoped to your account. Nothing is sent to a server.</div>
+            <div className="row gap-8 wrap">
+              <button className="btn ghost" onClick={() => { loadDemo(); }}><Icon name="sparkle" size={14} /> Load demo data</button>
+              <button className="btn danger" onClick={() => setReset(true)}><Icon name="trash" size={14} /> Reset (clear all)</button>
+            </div>
           </div>
         </div>
       </div>
       {reset && (
-        <Modal title="Reset demo data?" desc="Wipes all invoices, clients and projects."
+        <Modal title="Clear all data?" desc="Sets every invoice, client, project and service to zero."
           onClose={() => setReset(false)}
           footer={<>
             <button className="btn ghost" onClick={() => setReset(false)}>Cancel</button>
-            <button className="btn danger" onClick={() => { resetData(); setReset(false); }}>Reset everything</button>
+            <button className="btn danger" onClick={() => { resetData(); setReset(false); }}>Clear everything</button>
           </>}>
-          <div className="muted small">This restores the seed data and cannot be undone.</div>
+          <div className="muted small">Your workspace becomes empty (all counts → 0). Payment methods and default currency are kept. This cannot be undone.</div>
         </Modal>
       )}
     </div>
@@ -250,6 +253,7 @@ function Shell({ route, id }) {
   const store = useStore();
   const { account, signOut } = useAuth();
   const [search, setSearch] = useState("");
+  const [navOpen, setNavOpen] = useState(false);
 
   const counts = {
     invoices: store.invoices.length,
@@ -258,7 +262,7 @@ function Shell({ route, id }) {
     services: store.services.length,
   };
 
-  const onNav = (name, opts) => nav(name, opts);
+  const onNav = (name, opts) => { nav(name, opts); setNavOpen(false); };
   const params = { id };
 
   const crumbs = [{ label: "MyDesk", onClick: () => onNav("dashboard") }];
@@ -293,20 +297,27 @@ function Shell({ route, id }) {
   }
 
   return (
-    <div className="app">
-      <Sidebar route={route} onNav={onNav} counts={counts} account={account} onSignOut={signOut} />
+    <div className={"app" + (navOpen ? " nav-open" : "")}>
+      <Sidebar route={route} onNav={onNav} counts={counts} account={account} onSignOut={signOut} open={navOpen} />
+      {navOpen && <div className="nav-overlay" onClick={() => setNavOpen(false)} />}
       <div className="main">
-        <Topbar crumbs={crumbs} search={search} onSearch={(v) => { setSearch(v); if (route !== "invoices" && v) onNav("invoices"); }} />
+        <Topbar crumbs={crumbs} search={search} onMenu={() => setNavOpen(true)}
+          onSearch={(v) => { setSearch(v); if (route !== "invoices" && v) onNav("invoices"); }} />
         {Screen}
       </div>
     </div>
   );
 }
 
-/* ---------- Auth gate ---------- */
+/* ---------- Auth gate: landing -> login -> app ---------- */
 function AuthedApp({ route, id }) {
   const { account } = useAuth();
-  if (!account) return <LoginScreen />;
+  const [showLogin, setShowLogin] = useState(false);
+  if (!account) {
+    return showLogin
+      ? <LoginScreen onBack={() => setShowLogin(false)} />
+      : <LandingScreen onStart={() => setShowLogin(true)} />;
+  }
   return (
     <StoreProvider key={account.id} accountId={account.id}>
       <Shell route={route} id={id} />

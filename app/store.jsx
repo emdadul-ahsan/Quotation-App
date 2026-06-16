@@ -149,6 +149,19 @@ function seed() {
   return { business, clients, invoices, projects, services, nextInvoiceNum: 147 };
 }
 
+/* Empty workspace — used by "Reset data" so every count goes to 0.
+   Keeps payment methods + default currency so the app stays usable. */
+function emptyState() {
+  return {
+    business: {
+      name: "", email: "", addr: "", phone: "", logo: "",
+      defaultCurrency: "USD",
+      paymentMethods: (window.DEFAULT_PAYMENT_METHODS || ["Stripe", "Bank transfer", "PayPal", "Cash"]).slice(),
+    },
+    clients: [], invoices: [], projects: [], services: [], nextInvoiceNum: 1,
+  };
+}
+
 /* ---------- Migration / load ---------- */
 function refreshOverdue(state) {
   const t = todayISO();
@@ -331,10 +344,14 @@ function StoreProvider({ accountId, children }) {
   const removePaymentMethod = useCallback((name) => mut((n) => { n.business.paymentMethods = n.business.paymentMethods.filter((m) => m !== name); }), []);
 
   const resetData = useCallback(() => {
-    try { localStorage.removeItem(lsKey(accountId)); } catch (e) {}
+    setState(emptyState());
+    toast("All data cleared", "info");
+  }, [toast]);
+
+  const loadDemo = useCallback(() => {
     setState(refreshOverdue(seed()));
-    toast("Demo data reset", "info");
-  }, [toast, accountId]);
+    toast("Demo data loaded", "ok");
+  }, [toast]);
 
   const value = useMemo(() => ({
     ...state,
@@ -343,11 +360,11 @@ function StoreProvider({ accountId, children }) {
     updateProject, toggleMilestone, invoiceMilestone,
     createClient, updateClient, deleteClient,
     createService, updateService, deleteService,
-    updateBusiness, addPaymentMethod, removePaymentMethod, resetData, toast,
+    updateBusiness, addPaymentMethod, removePaymentMethod, resetData, loadDemo, toast,
   }), [state, getClient, getInvoice, getProject, getService, invoiceTotal, invoicesByClient, projectsByClient, projectProgress, projectAmounts,
     createInvoice, updateInvoice, deleteInvoice, sendInvoice, markPaid, sendReminder, duplicateInvoice,
     updateProject, toggleMilestone, invoiceMilestone, createClient, updateClient, deleteClient,
-    createService, updateService, deleteService, updateBusiness, addPaymentMethod, removePaymentMethod, resetData, toast]);
+    createService, updateService, deleteService, updateBusiness, addPaymentMethod, removePaymentMethod, resetData, loadDemo, toast]);
 
   return (
     <StoreCtx.Provider value={value}>

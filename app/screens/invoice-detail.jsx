@@ -56,7 +56,7 @@ function InvoiceDetailScreen({ onNav, params }) {
         </div>
       )}
 
-      <div className="grid" style={{ gridTemplateColumns: "1.5fr 1fr" }}>
+      <div className="grid grid-asym">
         <div><InvoicePaper inv={inv} client={c} business={business} total={total} stamp={stamp} /></div>
 
         <div className="col gap-16">

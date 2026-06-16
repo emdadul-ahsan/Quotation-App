@@ -33,6 +33,10 @@ const ICONS = {
   clock: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20M12 6v6l4 2",
   edit: "M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z",
   receipt: "M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1V2l-2 1-2-1-2 1-2-1-2 1-2-1zM8 7h8M8 11h8M8 15h5",
+  menu: "M3 6h18M3 12h18M3 18h18",
+  zap: "M13 2L3 14h9l-1 8 10-12h-9z",
+  globe: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20",
+  shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
 };
 
 function Icon({ name, size = 16, color }) {
@@ -70,7 +74,7 @@ function ClientCell({ client, sub }) {
 }
 
 /* ---------- Sidebar ---------- */
-function Sidebar({ route, onNav, counts, account, onSignOut }) {
+function Sidebar({ route, onNav, counts, account, onSignOut, open }) {
   const items = [
     { key: "dashboard", label: "Dashboard", icon: "dashboard" },
     { key: "invoices", label: "Invoices", icon: "invoice", count: counts.invoices },
@@ -85,7 +89,7 @@ function Sidebar({ route, onNav, counts, account, onSignOut }) {
     (k === "projects" && route === "project-detail");
   const acct = account || { name: "Guest", email: "", picture: "" };
   return (
-    <aside className="sidebar">
+    <aside className={"sidebar" + (open ? " open" : "")}>
       <div className="brand">
         <div className="logo">M</div>
         <div className="name">MyDesk <span>· Invoicing</span></div>
@@ -115,9 +119,10 @@ function Sidebar({ route, onNav, counts, account, onSignOut }) {
 }
 
 /* ---------- Topbar ---------- */
-function Topbar({ crumbs, search, onSearch }) {
+function Topbar({ crumbs, search, onSearch, onMenu }) {
   return (
     <div className="topbar">
+      <button className="menu-btn icon-btn" onClick={onMenu} title="Menu"><Icon name="menu" size={18} /></button>
       <div className="crumbs">
         {crumbs.map((c, i) => (
           <React.Fragment key={i}>

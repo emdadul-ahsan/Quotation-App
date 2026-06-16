@@ -104,6 +104,12 @@ input, textarea, select { font-family: inherit; }
 .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
 .main { display: flex; flex-direction: column; min-width: 0; }
 .screen { padding: 24px 32px 64px; max-width: 1280px; width: 100%; margin: 0 auto; }
+.menu-btn { display: none; }
+.nav-overlay { display: none; }
+
+/* asymmetric two-column layout that collapses on small screens */
+.grid-asym { grid-template-columns: 1.5fr 1fr; }
+@media (max-width: 920px) { .grid-asym { grid-template-columns: 1fr; } }
 
 /* ---------- Sidebar ---------- */
 .sidebar {
@@ -413,8 +419,10 @@ select.input { appearance: none; cursor: pointer; }
 }
 .auth-card {
   width: 100%; max-width: 400px; background: var(--deep-slate); border: 1px solid var(--border-strong);
-  border-radius: var(--r-lg); padding: 32px; box-shadow: var(--shadow-lg); text-align: center;
+  border-radius: var(--r-lg); padding: 32px; box-shadow: var(--shadow-lg); text-align: center; position: relative;
 }
+.auth-back { position: absolute; left: 16px; top: 16px; display: inline-flex; align-items: center; gap: 5px; background: none; border: none; color: var(--storm-cloud); font-size: 12.5px; }
+.auth-back:hover { color: var(--porcelain); }
 .auth-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 22px; }
 .auth-brand .logo { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, var(--violet-600), var(--cyan-spark)); display: grid; place-items: center; color: #fff; font-weight: 700; }
 .auth-brand .name { font-weight: 600; }
@@ -432,6 +440,111 @@ select.input { appearance: none; cursor: pointer; }
 .auth-guest { width: 100%; justify-content: center; }
 .auth-fine { margin-top: 12px; line-height: 1.5; }
 .auth-foot { color: var(--fog-grey); }
+
+/* ============================================================
+   Responsive — tablet & mobile
+   ============================================================ */
+@media (max-width: 920px) {
+  .app { grid-template-columns: 1fr; }
+  .menu-btn { display: grid; }
+  .sidebar {
+    position: fixed; left: 0; top: 0; height: 100vh; width: 248px; z-index: 130;
+    transform: translateX(-100%); transition: transform .22s ease;
+    box-shadow: var(--shadow-lg);
+  }
+  .sidebar.open { transform: none; }
+  .nav-overlay { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 120; }
+  .screen { padding: 18px 16px 56px; }
+  .topbar { padding: 10px 14px; gap: 10px; }
+  .search-box { width: auto; flex: 1; min-width: 0; }
+  .search-box .kbd { display: none; }
+  .crumbs { display: none; }
+  .page-head { flex-direction: column; align-items: stretch; }
+  .page-head .row { flex-wrap: wrap; }
+  .editor-split { grid-template-columns: 1fr; }
+  .preview-sticky { position: static; }
+  .inv-paper { padding: 24px; }
+  .kpi .value { font-size: 22px; }
+  /* tables scroll horizontally instead of squashing */
+  .card.flush { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table { min-width: 620px; }
+  .line-row, .line-head { grid-template-columns: 1fr 52px 78px 78px 30px; gap: 6px; }
+}
+@media (max-width: 560px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .page-head h1 { font-size: 19px; }
+  .btn { padding: 8px 11px; }
+  .modal { max-width: 100%; }
+  .toast-wrap { left: 12px; right: 12px; bottom: 12px; }
+  .toast { min-width: 0; }
+  .line-row, .line-head { grid-template-columns: 1fr 44px 66px 66px 28px; }
+  .lr-amt { font-size: 11.5px; }
+}
+
+/* ============================================================
+   Landing page
+   ============================================================ */
+.landing { min-height: 100vh; background:
+  radial-gradient(1000px 600px at 80% -5%, rgba(94,106,210,.16), transparent 55%),
+  radial-gradient(800px 500px at -5% 30%, rgba(2,184,204,.08), transparent 55%),
+  var(--pitch-black); }
+.lp-nav { display: flex; align-items: center; justify-content: space-between; max-width: 1160px; margin: 0 auto; padding: 18px 24px; }
+.lp-brand { display: flex; align-items: center; gap: 10px; }
+.lp-brand .logo { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--violet-600), var(--cyan-spark)); display: grid; place-items: center; color: #fff; font-weight: 700; }
+.lp-brand .name { font-weight: 600; }
+.lp-brand .name span { color: var(--storm-cloud); font-weight: 500; }
+
+.lp-hero { max-width: 1160px; margin: 0 auto; padding: 56px 24px 40px; display: grid; grid-template-columns: 1.05fr .95fr; gap: 48px; align-items: center; }
+.lp-badge { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: var(--light-steel); background: var(--deep-slate); border: 1px solid var(--border-strong); padding: 6px 12px; border-radius: var(--r-pill); }
+.lp-h1 { font-size: 52px; line-height: 1.05; letter-spacing: -.03em; font-weight: 700; margin: 20px 0 0; }
+.lp-lead { color: var(--storm-cloud); font-size: 16px; line-height: 1.6; margin: 18px 0 26px; max-width: 520px; }
+.lp-cta-btn { padding: 11px 18px; font-size: 14px; }
+.lp-stats { display: flex; gap: 32px; margin-top: 38px; }
+.lp-stat-v { font-size: 24px; font-weight: 700; font-family: var(--mono); letter-spacing: -.02em; }
+.lp-stat-l { color: var(--storm-cloud); font-size: 12.5px; margin-top: 2px; }
+
+.lp-hero-art { position: relative; height: 340px; }
+.lp-art-card { background: var(--deep-slate); border: 1px solid var(--border-strong); border-radius: var(--r-lg); box-shadow: var(--shadow-lg); }
+.lp-art-main { position: absolute; right: 0; top: 20px; width: 300px; padding: 22px; }
+.lp-art-big { font-size: 34px; font-weight: 700; letter-spacing: -.02em; }
+.lp-art-bars { display: flex; align-items: flex-end; gap: 8px; height: 86px; margin-top: 22px; }
+.lp-art-bars span { flex: 1; background: linear-gradient(180deg, var(--violet-600), var(--violet-700)); border-radius: 4px 4px 0 0; }
+.lp-art-float { position: absolute; left: 0; top: 130px; width: 200px; padding: 14px; animation: lp-float 4s ease-in-out infinite; }
+.lp-art-float2 { position: absolute; left: 40px; bottom: 6px; padding: 12px 14px; animation: lp-float 4s ease-in-out infinite .8s; }
+@keyframes lp-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+
+.lp-section { max-width: 1160px; margin: 0 auto; padding: 48px 24px; }
+.lp-sec-head { text-align: center; margin-bottom: 36px; }
+.lp-sec-head h2 { font-size: 30px; font-weight: 700; letter-spacing: -.02em; }
+.lp-sec-head p { margin-top: 8px; font-size: 15px; }
+.lp-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.lp-feature { background: var(--deep-slate); border: 1px solid var(--border); border-radius: var(--r-card); padding: 22px; display: flex; flex-direction: column; gap: 8px; }
+.lp-feature:hover { border-color: var(--border-strong); }
+.lp-feat-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(94,106,210,.14); color: var(--violet-600); display: grid; place-items: center; margin-bottom: 6px; }
+
+.lp-final { background:
+  linear-gradient(135deg, rgba(94,106,210,.16), rgba(2,184,204,.08)),
+  var(--deep-slate); border: 1px solid var(--border-strong); border-radius: var(--r-lg);
+  padding: 48px 24px; text-align: center; }
+.lp-final h2 { font-size: 28px; font-weight: 700; letter-spacing: -.02em; }
+.lp-final p { margin: 8px 0 22px; }
+
+.lp-foot { max-width: 1160px; margin: 0 auto; padding: 28px 24px 48px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 12px; }
+
+@media (max-width: 900px) {
+  .lp-hero { grid-template-columns: 1fr; padding-top: 32px; gap: 28px; }
+  .lp-hero-art { height: 280px; max-width: 360px; }
+  .lp-h1 { font-size: 38px; }
+  .lp-features { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .lp-h1 { font-size: 31px; }
+  .lp-lead { font-size: 15px; }
+  .lp-stats { gap: 22px; }
+  .lp-hero-art { display: none; }
+  .lp-nav .btn.ghost { display: none; }
+  .lp-sec-head h2, .lp-final h2 { font-size: 23px; }
+}
 
 /* Logo uploader */
 .logo-up { display: flex; align-items: center; gap: 16px; }

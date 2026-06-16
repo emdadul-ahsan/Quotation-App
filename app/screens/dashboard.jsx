@@ -62,7 +62,7 @@ function DashboardScreen({ onNav }) {
         <div className={"kpi" + (overdueSum > 0 ? " warn" : "")}><div className="label">Overdue</div><div className="value">{fmtMoney(overdueSum)}</div><div className="trend">{overdueInvs.length} invoices late</div></div>
       </div>
 
-      <div className="grid" style={{ gridTemplateColumns: "1.4fr 1fr" }}>
+      <div className="grid grid-asym">
         <div className="card">
           <div className="card-head"><h3>Cashflow</h3><span className="muted small">Last 6 months · paid</span></div>
           <div className="chart">
