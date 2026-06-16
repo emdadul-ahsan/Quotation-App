@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MyDesk · Invoicing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React 18 + Babel standalone (no build step) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Google Identity Services (used only if no Firebase config is set) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Firebase (compat build → global `firebase`). Configure in config.jsx. -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+
+  <!-- Force classic JSX runtime (React.createElement) — avoids unresolved
+       "react/jsx-runtime" bare import that the no-build browser can't load. -->
+  <script>
+    Babel.registerPreset("react-classic", {
+      presets: [[Babel.availablePresets["react"], { runtime: "classic" }]],
+    });
+  </script>
+
+  <!-- App scripts: order matters. config -> store -> ui -> auth -> screens -> app -->
+  <script type="text/babel" src="config.jsx" data-presets="react-classic"></script>
+  <script type="text/babel" src="store.jsx" data-presets="react-classic"></script>
+  <script type="text/babel" src="ui.jsx" data-presets="react-classic"></script>
+  <script type="text/babel" src="auth.jsx" data-presets="react-classic"></script>
+  <script type="text/babel" src="screens/dashboard.jsx" data-presets="react-classic"></script>
+  <script type="text/babel" src="screens/invoices.jsx" data-presets="react-classic"></script>
+  <script type="text/babel" src="screens/invoice-detail.jsx" data-presets="react-classic"></script>
+  <script type="text/babel" src="screens/invoice-editor.jsx" data-presets="react-classic"></script>
+  <script type="text/babel" src="screens/projects.jsx" data-presets="react-classic"></script>
+  <script type="text/babel" src="screens/services.jsx" data-presets="react-classic"></script>
+  <script type="text/babel" src="app.jsx" data-presets="react-classic"></script>
+</body>
+</html>

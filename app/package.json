@@ -1,0 +1,10 @@
+{
+  "name": "mydesk-invoicing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MyDesk · Invoicing — single-page React 18 app, no build step, localStorage persistence.",
+  "scripts": {
+    "start": "npx --yes serve -l 5173 .",
+    "serve": "npx --yes serve -l 5173 ."
+  }
+}

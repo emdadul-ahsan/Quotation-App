@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Env / secrets (Firebase web config is public, but keep this for any future secrets)
+.env
+.env.local
