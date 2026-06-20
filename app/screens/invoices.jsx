@@ -37,7 +37,7 @@ function InvoicesScreen({ onNav, search }) {
     <div className="screen">
       <div className="page-head">
         <div><h1>Invoices</h1><div className="sub">{invoices.length} total · {fmtMoney(invoices.filter(i=>i.status!=="paid"&&i.status!=="draft").reduce((s,i)=>s+invoiceTotal(i),0))} outstanding</div></div>
-        <button className="btn violet" onClick={() => onNav("editor")}><Icon name="plus" size={15} /> New invoice</button>
+        <button className="btn violet" onClick={() => startInvoice(onNav)}><Icon name="plus" size={15} /> New invoice</button>
       </div>
 
       <div className="spread mb-16 wrap gap-12">

@@ -82,7 +82,7 @@ function ProjectsScreen({ onNav }) {
 
 function ProjectDetailScreen({ onNav, params }) {
   const store = useStore();
-  const { getProject, getClient, getInvoice, invoicesByProject, projectProgress, projectAmounts, toggleMilestone, invoiceMilestone, generateProjectInvoice, deleteProject } = store;
+  const { getProject, getClient, getInvoice, invoicesByProject, projectProgress, projectAmounts, toggleMilestone, deleteProject } = store;
   const p = getProject(params.id);
   if (!p) return <div className="screen"><div className="empty"><div>Project not found.</div><button className="btn ghost" onClick={() => onNav("projects")}>Back</button></div></div>;
   const c = getClient(p.clientId);
@@ -91,20 +91,18 @@ function ProjectDetailScreen({ onNav, params }) {
   const linked = invoicesByProject(p.id);
   const cur = p.currency;
 
-  const [gen, setGen] = React.useState(false);
   const [del, setDel] = React.useState(false);
-  const [amt, setAmt] = React.useState(a.remaining);
-  const [desc, setDesc] = React.useState("");
 
-  const openGen = () => { setAmt(a.remaining); setDesc(p.name + " — progress billing"); setGen(true); };
-  const doGen = (status) => {
-    const v = Number(amt) || 0;
-    if (v <= 0) { store.toast("Enter an amount", "warn"); return; }
-    if (v > a.remaining) { store.toast("Amount exceeds remaining valuation", "warn"); return; }
-    const inv = generateProjectInvoice(p.id, { amount: v, desc, status });
-    setGen(false);
-    onNav("invoice-detail", { id: inv.id });
-  };
+  /* same flow as everywhere: open the editor pre-filled, review, then save/send */
+  const billRemaining = () => startInvoice(onNav, {
+    clientId: p.clientId, projectId: p.id, project: p.name, currency: cur,
+    items: [{ desc: p.name + " — progress billing", qty: 1, rate: a.remaining }],
+  });
+  const billMilestone = (m) => startInvoice(onNav, {
+    clientId: p.clientId, projectId: p.id, project: p.name + " · " + m.title, currency: cur,
+    items: [{ desc: m.title, qty: 1, rate: m.amount }],
+    linkMilestone: { projectId: p.id, milestoneId: m.id },
+  });
 
   return (
     <div className="screen">
@@ -114,7 +112,7 @@ function ProjectDetailScreen({ onNav, params }) {
           <div><h1>{p.name}</h1><div className="sub">{c ? c.name : "—"} · {cur} · valuation {fmtMoney(a.total, cur)}</div></div>
         </div>
         <div className="row gap-8">
-          <button className="btn violet" onClick={openGen} disabled={a.remaining <= 0}><Icon name="receipt" size={14} /> Generate invoice</button>
+          <button className="btn violet" onClick={billRemaining} disabled={a.remaining <= 0}><Icon name="receipt" size={14} /> Generate invoice</button>
           <RowMenu items={[{ icon: "trash", label: "Delete project", danger: true, onClick: () => setDel(true) }]} />
         </div>
       </div>
@@ -146,7 +144,7 @@ function ProjectDetailScreen({ onNav, params }) {
               <div className="progress"><div className="bar" style={{ width: (a.total ? (a.remaining / a.total) * 100 : 0) + "%", background: "var(--violet-600)", opacity: .5 }} /></div>
               <span className="track-val mono violet-text">{fmtMoney(a.remaining, cur)}</span>
             </div>
-            <button className="btn violet mt-16" onClick={openGen} disabled={a.remaining <= 0}>
+            <button className="btn violet mt-16" onClick={billRemaining} disabled={a.remaining <= 0}>
               <Icon name="receipt" size={14} /> {a.remaining > 0 ? "Bill " + fmtMoney(a.remaining, cur) + " remaining" : "Fully invoiced"}
             </button>
           </div>
@@ -168,7 +166,7 @@ function ProjectDetailScreen({ onNav, params }) {
                     {linkedInv
                       ? <span onClick={() => onNav("invoice-detail", { id: linkedInv.id })} style={{ cursor: "pointer" }}><StatusPill status={linkedInv.status} /></span>
                       : done
-                        ? <button className="btn violet sm" onClick={() => invoiceMilestone(p.id, m.id)}><Icon name="send" size={12} /> Invoice</button>
+                        ? <button className="btn violet sm" onClick={() => billMilestone(m)}><Icon name="receipt" size={12} /> Invoice</button>
                         : <button className="btn ghost sm" onClick={() => toggleMilestone(p.id, m.id)}>Mark done</button>}
                   </div>
                 );
@@ -201,26 +199,6 @@ function ProjectDetailScreen({ onNav, params }) {
         </div>
       </div>
 
-      {gen && (
-        <Modal title="Generate invoice" desc={"Bill against " + p.name + " · " + fmtMoney(a.remaining, cur) + " remaining"}
-          onClose={() => setGen(false)}
-          footer={<>
-            <button className="btn ghost" onClick={() => setGen(false)}>Cancel</button>
-            <button className="btn" onClick={() => doGen("draft")}>Save draft</button>
-            <button className="btn violet" onClick={() => doGen("pending")}><Icon name="send" size={14} /> Create &amp; send</button>
-          </>}>
-          <div className="field"><label>Amount ({cur})</label>
-            <input className="input" type="number" min="0" max={a.remaining} value={amt} onChange={(e) => setAmt(e.target.value)} />
-            <div className="row gap-8 mt-8 wrap">
-              {[0.25, 0.5, 1].map((f) => (
-                <button key={f} className="btn ghost sm" onClick={() => setAmt(Math.round(a.remaining * f))}>{f === 1 ? "All remaining" : (f * 100) + "%"}</button>
-              ))}
-            </div>
-          </div>
-          <div className="field"><label>Description</label><input className="input" value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Milestone 2 — design phase" /></div>
-          <div className="muted tiny">After this invoice, remaining to invoice will be {fmtMoney(Math.max(0, a.remaining - (Number(amt) || 0)), cur)}.</div>
-        </Modal>
-      )}
       {del && (
         <Modal title="Delete project?" desc={"Remove " + p.name + "."}
           onClose={() => setDel(false)}

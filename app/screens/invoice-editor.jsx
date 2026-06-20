@@ -7,13 +7,24 @@ function InvoiceEditorScreen({ onNav, params }) {
   const { useState } = React;
   const editing = params.id ? getInvoice(params.id) : null;
 
-  const blank = {
+  /* prefill stash set by startInvoice() — consumed once on mount */
+  const prefill = React.useMemo(() => {
+    const p = window.__invoiceDraft; window.__invoiceDraft = null;
+    return (!editing && p) ? p : null;
+  }, []);
+  const [linkMilestone] = useState(prefill && prefill.linkMilestone ? prefill.linkMilestone : null);
+  const withIds = (items) => (items || []).map((x, i) => ({ id: x.id || ("l" + (i + 1) + "-" + Math.random().toString(36).slice(2, 6)), desc: x.desc || "", qty: x.qty != null ? x.qty : 1, rate: x.rate != null ? x.rate : 0 }));
+
+  const base = {
     clientId: clients[0] ? clients[0].id : "",
     projectId: "", project: "", issued: todayISO(), due: daysFromNow(30),
     currency: business.defaultCurrency || "USD",
     method: business.paymentMethods[0] || "",
     items: [{ id: "l1", desc: "", qty: 1, rate: 0 }], notes: "Net 30. Thank you for your business.",
   };
+  const blank = prefill
+    ? { ...base, ...prefill, items: prefill.items && prefill.items.length ? withIds(prefill.items) : base.items, linkMilestone: undefined }
+    : base;
   const [form, setForm] = useState(() => editing
     ? { clientId: editing.clientId, projectId: editing.projectId || "", project: editing.project, issued: editing.issued, due: editing.due, currency: editing.currency || business.defaultCurrency, method: editing.method || business.paymentMethods[0] || "", items: editing.items.map((x) => ({ ...x })), notes: editing.notes }
     : blank);
@@ -54,7 +65,7 @@ function InvoiceEditorScreen({ onNav, params }) {
       store.toast(status === "pending" ? "Invoice sent" : "Draft saved", "ok");
       onNav("invoice-detail", { id: editing.id });
     } else {
-      const created = createInvoice({ ...form, status });
+      const created = createInvoice({ ...form, status, linkMilestone });
       store.toast(status === "pending" ? "Invoice created & sent" : "Draft saved", "ok");
       onNav("invoice-detail", { id: created.id });
     }

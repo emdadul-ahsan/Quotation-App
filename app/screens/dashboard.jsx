@@ -58,7 +58,7 @@ function DashboardScreen({ onNav }) {
         </div>
         <div className="row gap-8">
           <button className="btn ghost" onClick={() => onNav("invoices")}>View all invoices</button>
-          <button className="btn violet" onClick={() => onNav("editor")}><Icon name="plus" size={15} /> New invoice</button>
+          <button className="btn violet" onClick={() => startInvoice(onNav)}><Icon name="plus" size={15} /> New invoice</button>
         </div>
       </div>
 

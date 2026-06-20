@@ -94,7 +94,7 @@ function Sidebar({ route, onNav, counts, account, onSignOut, open }) {
         <div className="logo">M</div>
         <div className="name">MyDesk <span>· Invoicing</span></div>
       </div>
-      <button className="cta-new" onClick={() => onNav("editor")}>
+      <button className="cta-new" onClick={() => startInvoice(onNav)}>
         <Icon name="plus" size={15} /> New invoice
       </button>
       {items.map((it) => (

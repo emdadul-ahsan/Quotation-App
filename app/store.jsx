@@ -254,6 +254,12 @@ function StoreProvider({ accountId, children }) {
       };
       if (draft.status === "pending") created.activity.push({ id: "a2", type: "sent", when: todayISO(), note: "Invoice sent" });
       n.invoices.unshift(created);
+      /* optionally link a milestone (when invoice was started from one) */
+      if (draft.linkMilestone) {
+        const p = n.projects.find((x) => x.id === draft.linkMilestone.projectId);
+        const m = p && p.milestones.find((x) => x.id === draft.linkMilestone.milestoneId);
+        if (m) { m.invoiceId = id; if (m.status !== "done") m.status = "done"; }
+      }
       return n;
     });
     return created;

@@ -14,6 +14,15 @@ function nav(name, opts) {
   window.location.hash = "#/" + name + (opts && opts.id ? "/" + opts.id : "");
 }
 
+/* Unified invoice-creation entry point: stash a prefill, open the editor.
+   Every "new/generate invoice" action across the app routes through here so
+   the flow (editor + live preview -> save/send) is identical everywhere. */
+function startInvoice(onNav, prefill) {
+  window.__invoiceDraft = prefill || null;
+  (onNav || nav)("editor");
+}
+window.startInvoice = startInvoice;
+
 /* ---------- Clients screen ---------- */
 function ClientsScreen({ onNav }) {
   const store = useStore();
@@ -33,10 +42,7 @@ function ClientsScreen({ onNav }) {
     else { updateClient(modal.client.id, form); store.toast("Client updated", "ok"); }
     setModal(null);
   };
-  const newInvoiceFor = (c) => {
-    const inv = createInvoice({ clientId: c.id, status: "draft" });
-    onNav("editor", { id: inv.id });
-  };
+  const newInvoiceFor = (c) => startInvoice(onNav, { clientId: c.id });
 
   return (
     <div className="screen">
