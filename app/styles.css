@@ -392,6 +392,18 @@ select.input { appearance: none; cursor: pointer; }
 .totals-box .tr.grand { font-weight: 700; font-size: 16px; margin-top: 4px; }
 .totals-box .mono { font-family: var(--mono); }
 
+/* Dashboard project rows */
+.proj-row { display: grid; grid-template-columns: 1.2fr 1.6fr auto; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border-soft); cursor: pointer; }
+.proj-row:last-child { border-bottom: none; }
+.proj-row:hover { background: var(--elevated); }
+.proj-bar { min-width: 0; }
+@media (max-width: 700px) { .proj-row { grid-template-columns: 1fr auto; } .proj-bar { display: none; } }
+
+/* Project billing tracker rows */
+.track-row { display: grid; grid-template-columns: 80px 1fr 100px; align-items: center; gap: 12px; padding: 8px 0; }
+.track-label { color: var(--storm-cloud); font-size: 12.5px; font-weight: 500; }
+.track-val { text-align: right; font-size: 13px; font-weight: 600; }
+
 /* Milestone row */
 .ms-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border-soft); }
 .ms-row:last-child { border-bottom: none; }

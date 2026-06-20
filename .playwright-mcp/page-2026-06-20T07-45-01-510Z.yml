@@ -1,0 +1,198 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]: M
+      - generic [ref=e7]: MyDesk · Invoicing
+    - button "New invoice" [ref=e8] [cursor=pointer]:
+      - img [ref=e9]
+      - text: New invoice
+    - button "Dashboard" [ref=e11] [cursor=pointer]:
+      - img [ref=e12]
+      - text: Dashboard
+    - button "Invoices 7" [ref=e14] [cursor=pointer]:
+      - img [ref=e15]
+      - text: Invoices
+      - generic [ref=e17]: "7"
+    - button "Projects 4" [ref=e18] [cursor=pointer]:
+      - img [ref=e19]
+      - text: Projects
+      - generic [ref=e21]: "4"
+    - button "Clients 5" [ref=e22] [cursor=pointer]:
+      - img [ref=e23]
+      - text: Clients
+      - generic [ref=e25]: "5"
+    - button "Services 6" [ref=e26] [cursor=pointer]:
+      - img [ref=e27]
+      - text: Services
+      - generic [ref=e29]: "6"
+    - button "Settings" [ref=e30] [cursor=pointer]:
+      - img [ref=e31]
+      - text: Settings
+    - generic [ref=e34]:
+      - generic [ref=e35]: G
+      - generic [ref=e36]:
+        - generic [ref=e37]: Guest
+        - generic [ref=e38]: Local guest
+      - button "Sign out" [ref=e39] [cursor=pointer]:
+        - img [ref=e40]
+  - generic [ref=e42]:
+    - generic [ref=e43]:
+      - button "Menu" [ref=e44] [cursor=pointer]:
+        - img [ref=e45]
+      - generic [ref=e47]:
+        - generic [ref=e48] [cursor=pointer]: MyDesk
+        - generic [ref=e49]: /
+        - generic [ref=e50]: Dashboard
+      - generic [ref=e51]:
+        - img [ref=e52]
+        - textbox "Search invoices, clients…" [ref=e54]
+        - generic [ref=e55]: ⌘K
+      - button [ref=e56] [cursor=pointer]:
+        - img [ref=e57]
+    - generic [ref=e59]:
+      - generic [ref=e60]:
+        - generic [ref=e61]:
+          - heading "Dashboard" [level=1] [ref=e62]
+          - generic [ref=e63]: Here's what needs your attention today.
+        - generic [ref=e64]:
+          - button "View all invoices" [ref=e65] [cursor=pointer]
+          - button "New invoice" [ref=e66] [cursor=pointer]:
+            - img [ref=e67]
+            - text: New invoice
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - generic [ref=e71]: Total earned
+          - generic [ref=e72]: $5,400.00
+          - generic [ref=e73]: All-time paid
+        - generic [ref=e74]:
+          - generic [ref=e75]: Awaiting payment
+          - generic [ref=e76]: $12,700.00
+          - generic [ref=e77]: 3 open invoices
+        - generic [ref=e78]:
+          - generic [ref=e79]: Paid this month
+          - generic [ref=e80]: $5,400.00
+          - generic [ref=e81]: Last 30 days
+        - generic [ref=e82]:
+          - generic [ref=e83]: Overdue
+          - generic [ref=e84]: $3,500.00
+          - generic [ref=e85]: 1 invoices late
+      - generic [ref=e86]:
+        - generic [ref=e87]:
+          - generic [ref=e88]:
+            - heading "Cashflow" [level=3] [ref=e89]
+            - generic [ref=e90]: Last 6 months · paid
+          - generic [ref=e91]:
+            - generic [ref=e94]: Jan
+            - generic [ref=e97]: Feb
+            - generic [ref=e100]: Mar
+            - generic [ref=e103]: Apr
+            - generic [ref=e104]:
+              - generic [ref=e105]: $2k
+              - generic [ref=e107]: May
+            - generic [ref=e108]:
+              - generic [ref=e109]: $3k
+              - generic [ref=e111]: Jun
+        - generic [ref=e112]:
+          - heading "Upcoming payments" [level=3] [ref=e114]
+          - generic [ref=e115] [cursor=pointer]:
+            - generic [ref=e116]:
+              - generic [ref=e117]: GI
+              - generic [ref=e118]:
+                - generic [ref=e119]: Gamma Inc.
+                - generic [ref=e120]: INV-0143
+            - generic [ref=e121]:
+              - generic [ref=e122]: $3,500.00
+              - generic [ref=e123]: 5d overdue
+          - generic [ref=e124] [cursor=pointer]:
+            - generic [ref=e125]:
+              - generic [ref=e126]: BS
+              - generic [ref=e127]:
+                - generic [ref=e128]: Beta Studio
+                - generic [ref=e129]: INV-0142
+            - generic [ref=e130]:
+              - generic [ref=e131]: £3,300.00
+              - generic [ref=e132]: in 10d
+          - generic [ref=e133] [cursor=pointer]:
+            - generic [ref=e134]:
+              - generic [ref=e135]: D&
+              - generic [ref=e136]:
+                - generic [ref=e137]: Delta & Co
+                - generic [ref=e138]: INV-0144
+            - generic [ref=e139]:
+              - generic [ref=e140]: €5,900.00
+              - generic [ref=e141]: in 24d
+      - generic [ref=e142]:
+        - generic [ref=e143]:
+          - heading "Projects" [level=3] [ref=e144]
+          - button "View all" [ref=e145] [cursor=pointer]
+        - generic [ref=e146]:
+          - generic [ref=e147]:
+            - generic [ref=e148]: Total valuation
+            - generic [ref=e149]: $23,500.00
+          - generic [ref=e150]:
+            - generic [ref=e151]: Invoiced
+            - generic [ref=e152]: $15,000.00
+          - generic [ref=e153]:
+            - generic [ref=e154]: Paid
+            - generic [ref=e155]: $3,200.00
+          - generic [ref=e156]:
+            - generic [ref=e157]: Remaining to invoice
+            - generic [ref=e158]: $8,500.00
+        - generic [ref=e159] [cursor=pointer]:
+          - generic [ref=e160]:
+            - generic [ref=e161]: AC
+            - generic [ref=e162]:
+              - generic [ref=e163]: denmo
+              - generic [ref=e164]: Acme Co.
+          - generic [ref=e168]: $200.00 of $5,000.00 · 4%
+          - generic [ref=e169]:
+            - generic [ref=e170]: $4,800.00
+            - generic [ref=e171]: remaining
+        - generic [ref=e172] [cursor=pointer]:
+          - generic [ref=e173]:
+            - generic [ref=e174]: AC
+            - generic [ref=e175]:
+              - generic [ref=e176]: Website Redesign
+              - generic [ref=e177]: Acme Co.
+          - generic [ref=e181]: $5,600.00 of $8,000.00 · 70%
+          - generic [ref=e182]:
+            - generic [ref=e183]: $2,400.00
+            - generic [ref=e184]: remaining
+        - generic [ref=e185] [cursor=pointer]:
+          - generic [ref=e186]:
+            - generic [ref=e187]: BS
+            - generic [ref=e188]:
+              - generic [ref=e189]: Brand Identity Kit
+              - generic [ref=e190]: Beta Studio
+          - generic [ref=e194]: £3,300.00 of £4,500.00 · 73%
+          - generic [ref=e195]:
+            - generic [ref=e196]: £1,200.00
+            - generic [ref=e197]: remaining
+        - generic [ref=e198] [cursor=pointer]:
+          - generic [ref=e199]:
+            - generic [ref=e200]: D&
+            - generic [ref=e201]:
+              - generic [ref=e202]: Marketing Site
+              - generic [ref=e203]: Delta & Co
+          - generic [ref=e207]: €5,900.00 of €6,000.00 · 98%
+          - generic [ref=e208]:
+            - generic [ref=e209]: €100.00
+            - generic [ref=e210]: remaining
+      - generic [ref=e211]:
+        - heading "Recent activity" [level=3] [ref=e213]
+        - generic [ref=e214]:
+          - generic [ref=e217] [cursor=pointer]:
+            - generic [ref=e218]: INV-0147 — Invoice created
+            - generic [ref=e219]: Jun 20, 2026
+          - generic [ref=e222] [cursor=pointer]:
+            - generic [ref=e223]: INV-0147 — Invoice sent
+            - generic [ref=e224]: Jun 20, 2026
+          - generic [ref=e227] [cursor=pointer]:
+            - generic [ref=e228]: INV-0147 — Marked paid via Stripe
+            - generic [ref=e229]: Jun 20, 2026
+          - generic [ref=e232] [cursor=pointer]:
+            - generic [ref=e233]: INV-0146 — Draft created
+            - generic [ref=e234]: Jun 20, 2026
+          - generic [ref=e237] [cursor=pointer]:
+            - generic [ref=e238]: INV-0143 — Reminder sent
+            - generic [ref=e239]: Jun 18, 2026

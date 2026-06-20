@@ -54,7 +54,7 @@ function seed() {
 
   const line = (id, desc, qty, rate) => ({ id, desc, qty, rate });
   const invoices = [
-    { id: "inv-0141", number: "INV-0141", clientId: "c1", project: "Website redesign · phase 1", currency: "USD",
+    { id: "inv-0141", number: "INV-0141", clientId: "c1", projectId: "p1", project: "Website redesign · phase 1", currency: "USD",
       issued: daysAgo(40), due: daysAgo(10), status: "paid", paidOn: daysAgo(8), method: "Stripe", ref: "ch_3PqRf2hzL",
       items: [line("l1", "Discovery sprint", 1, 1800), line("l2", "Wireframes", 1, 1200)],
       notes: "Thank you for your business. Payment terms: net 30.",
@@ -64,7 +64,7 @@ function seed() {
         { id: "a3", type: "opened", when: daysAgo(38), note: "Client opened invoice" },
         { id: "a4", type: "paid", when: daysAgo(8), note: "Paid via Stripe" },
       ] },
-    { id: "inv-0142", number: "INV-0142", clientId: "c2", project: "Brand identity kit", currency: "GBP",
+    { id: "inv-0142", number: "INV-0142", clientId: "c2", projectId: "p2", project: "Brand identity kit", currency: "GBP",
       issued: daysAgo(20), due: daysFromNow(10), status: "pending", method: "Bank transfer",
       items: [line("l1", "Logo suite", 1, 2400), line("l2", "Brand guidelines", 1, 900)],
       notes: "Net 30. Bank transfer details on file.",
@@ -83,7 +83,7 @@ function seed() {
         { id: "a3", type: "opened", when: daysAgo(33), note: "Client opened invoice" },
         { id: "a4", type: "reminder", when: daysAgo(2), note: "Reminder sent" },
       ] },
-    { id: "inv-0144", number: "INV-0144", clientId: "c4", project: "Marketing site build", currency: "EUR",
+    { id: "inv-0144", number: "INV-0144", clientId: "c4", projectId: "p3", project: "Marketing site build", currency: "EUR",
       issued: daysAgo(6), due: daysFromNow(24), status: "pending", method: "Wise",
       items: [line("l1", "Frontend build", 40, 110), line("l2", "CMS integration", 1, 1500)],
       notes: "Net 30.",
@@ -100,7 +100,7 @@ function seed() {
         { id: "a2", type: "sent", when: daysAgo(50), note: "Sent to invoices@epsilon.dev" },
         { id: "a3", type: "paid", when: daysAgo(22), note: "Paid via bank transfer" },
       ] },
-    { id: "inv-0146", number: "INV-0146", clientId: "c1", project: "Website redesign · phase 2", currency: "USD",
+    { id: "inv-0146", number: "INV-0146", clientId: "c1", projectId: "p1", project: "Website redesign · phase 2", currency: "USD",
       issued: todayISO(), due: daysFromNow(30), status: "draft", method: "Stripe",
       items: [line("l1", "Visual design", 1, 2600)],
       notes: "Net 30.",
@@ -172,7 +172,7 @@ function migrate(state) {
   if (!state.services) state.services = seed().services;
   if (!state.business.paymentMethods) state.business.paymentMethods = (window.DEFAULT_PAYMENT_METHODS || []).slice();
   if (!state.business.defaultCurrency) state.business.defaultCurrency = "USD";
-  state.invoices.forEach((i) => { if (!i.currency) i.currency = state.business.defaultCurrency; });
+  state.invoices.forEach((i) => { if (!i.currency) i.currency = state.business.defaultCurrency; if (i.projectId == null) i.projectId = ""; });
   state.clients.forEach((c) => { if (c.description == null) c.description = ""; });
   return state;
 }
@@ -211,14 +211,26 @@ function StoreProvider({ accountId, children }) {
   const invoiceTotal = useCallback((inv) => (inv?.items || []).reduce((s, it) => s + (Number(it.qty) || 0) * (Number(it.rate) || 0), 0), []);
   const invoicesByClient = useCallback((cid) => state.invoices.filter((i) => i.clientId === cid), [state]);
   const projectsByClient = useCallback((cid) => state.projects.filter((p) => p.clientId === cid), [state]);
+  const invoicesByProject = useCallback((pid) => state.invoices.filter((i) => i.projectId === pid), [state]);
   const projectProgress = useCallback((p) => {
     const total = p.milestones.length, done = p.milestones.filter((m) => m.status === "done").length;
     return { done, total, pct: total ? Math.round((done / total) * 100) : 0 };
   }, []);
+  /* Amount-based billing tracker, driven by invoices linked to the project. */
   const projectAmounts = useCallback((p) => {
-    const paid = p.milestones.filter((m) => m.status === "done").reduce((s, m) => s + m.amount, 0);
-    return { paid, remaining: p.total - paid, total: p.total };
-  }, []);
+    const linked = state.invoices.filter((i) => i.projectId === p.id);
+    const invoiceSum = (inv) => (inv.items || []).reduce((s, it) => s + (Number(it.qty) || 0) * (Number(it.rate) || 0), 0);
+    const invoiced = linked.reduce((s, i) => s + invoiceSum(i), 0);
+    const paid = linked.filter((i) => i.status === "paid").reduce((s, i) => s + invoiceSum(i), 0);
+    const total = p.total || 0;
+    return {
+      total, invoiced, paid,
+      outstanding: invoiced - paid,        // billed but not yet paid
+      remaining: Math.max(0, total - invoiced), // valuation left to invoice
+      pct: total ? Math.min(100, Math.round((invoiced / total) * 100)) : 0,
+      paidPct: total ? Math.min(100, Math.round((paid / total) * 100)) : 0,
+    };
+  }, [state]);
 
   const mut = (fn) => setState((s) => { const n = JSON.parse(JSON.stringify(s)); fn(n); return n; });
 
@@ -231,7 +243,7 @@ function StoreProvider({ accountId, children }) {
       const id = "inv-" + String(num).padStart(4, "0");
       created = {
         id, number: "INV-" + String(num).padStart(4, "0"),
-        clientId: draft.clientId || "", project: draft.project || "",
+        clientId: draft.clientId || "", projectId: draft.projectId || "", project: draft.project || "",
         currency: draft.currency || n.business.defaultCurrency || "USD",
         method: draft.method || (n.business.paymentMethods[0] || ""),
         issued: draft.issued || todayISO(), due: draft.due || daysFromNow(30),
@@ -309,7 +321,7 @@ function StoreProvider({ accountId, children }) {
       const num = n.nextInvoiceNum; n.nextInvoiceNum = num + 1;
       const id = "inv-" + String(num).padStart(4, "0");
       created = {
-        id, number: "INV-" + String(num).padStart(4, "0"), clientId: p.clientId, project: p.name + " · " + m.title,
+        id, number: "INV-" + String(num).padStart(4, "0"), clientId: p.clientId, projectId: p.id, project: p.name + " · " + m.title,
         currency: p.currency || n.business.defaultCurrency, method: n.business.paymentMethods[0] || "",
         issued: todayISO(), due: daysFromNow(30), status: "pending",
         items: [{ id: "l1", desc: m.title, qty: 1, rate: m.amount }], notes: "Net 30.",
@@ -319,6 +331,56 @@ function StoreProvider({ accountId, children }) {
       return n;
     });
     toast("Invoice generated & sent", "ok");
+    return created;
+  }, [toast]);
+
+  const createProject = useCallback((draft) => {
+    let created;
+    setState((s) => {
+      const n = JSON.parse(JSON.stringify(s));
+      created = {
+        id: "p-" + Date.now(),
+        name: draft.name || "New project",
+        clientId: draft.clientId || (n.clients[0] && n.clients[0].id) || "",
+        total: Number(draft.total) || 0,
+        currency: draft.currency || n.business.defaultCurrency || "USD",
+        milestones: [],
+      };
+      n.projects.push(created);
+      return n;
+    });
+    return created;
+  }, []);
+
+  const deleteProject = useCallback((id) => mut((n) => {
+    n.projects = n.projects.filter((p) => p.id !== id);
+    n.invoices.forEach((i) => { if (i.projectId === id) i.projectId = ""; });
+  }), []);
+
+  /* Generate an invoice for a custom amount billed against a project's remaining valuation. */
+  const generateProjectInvoice = useCallback((pid, { amount, desc, status } = {}) => {
+    let created;
+    setState((s) => {
+      const n = JSON.parse(JSON.stringify(s));
+      const p = n.projects.find((x) => x.id === pid);
+      if (!p) return s;
+      const num = n.nextInvoiceNum; n.nextInvoiceNum = num + 1;
+      const id = "inv-" + String(num).padStart(4, "0");
+      const st = status || "pending";
+      created = {
+        id, number: "INV-" + String(num).padStart(4, "0"),
+        clientId: p.clientId, projectId: p.id, project: p.name,
+        currency: p.currency || n.business.defaultCurrency, method: n.business.paymentMethods[0] || "",
+        issued: todayISO(), due: daysFromNow(30), status: st,
+        items: [{ id: "l1", desc: desc || (p.name + " — progress billing"), qty: 1, rate: Number(amount) || 0 }],
+        notes: "Net 30.",
+        activity: [{ id: "a1", type: "created", when: todayISO(), note: "Billed against project" }],
+      };
+      if (st === "pending") created.activity.push({ id: "a2", type: "sent", when: todayISO(), note: "Invoice sent" });
+      n.invoices.unshift(created);
+      return n;
+    });
+    toast(status === "draft" ? "Draft invoice created" : "Invoice generated & sent", "ok");
     return created;
   }, [toast]);
 
@@ -355,15 +417,15 @@ function StoreProvider({ accountId, children }) {
 
   const value = useMemo(() => ({
     ...state,
-    getClient, getInvoice, getProject, getService, invoiceTotal, invoicesByClient, projectsByClient, projectProgress, projectAmounts,
+    getClient, getInvoice, getProject, getService, invoiceTotal, invoicesByClient, projectsByClient, invoicesByProject, projectProgress, projectAmounts,
     createInvoice, updateInvoice, deleteInvoice, sendInvoice, markPaid, sendReminder, duplicateInvoice,
-    updateProject, toggleMilestone, invoiceMilestone,
+    updateProject, toggleMilestone, invoiceMilestone, createProject, deleteProject, generateProjectInvoice,
     createClient, updateClient, deleteClient,
     createService, updateService, deleteService,
     updateBusiness, addPaymentMethod, removePaymentMethod, resetData, loadDemo, toast,
-  }), [state, getClient, getInvoice, getProject, getService, invoiceTotal, invoicesByClient, projectsByClient, projectProgress, projectAmounts,
+  }), [state, getClient, getInvoice, getProject, getService, invoiceTotal, invoicesByClient, projectsByClient, invoicesByProject, projectProgress, projectAmounts,
     createInvoice, updateInvoice, deleteInvoice, sendInvoice, markPaid, sendReminder, duplicateInvoice,
-    updateProject, toggleMilestone, invoiceMilestone, createClient, updateClient, deleteClient,
+    updateProject, toggleMilestone, invoiceMilestone, createProject, deleteProject, generateProjectInvoice, createClient, updateClient, deleteClient,
     createService, updateService, deleteService, updateBusiness, addPaymentMethod, removePaymentMethod, resetData, loadDemo, toast]);
 
   return (

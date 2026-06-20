@@ -3,21 +3,28 @@
    ============================================================ */
 function InvoiceEditorScreen({ onNav, params }) {
   const store = useStore();
-  const { getInvoice, clients, business, services, createInvoice, updateInvoice, invoiceTotal } = store;
+  const { getInvoice, clients, projects, business, services, createInvoice, updateInvoice, invoiceTotal } = store;
   const { useState } = React;
   const editing = params.id ? getInvoice(params.id) : null;
 
   const blank = {
     clientId: clients[0] ? clients[0].id : "",
-    project: "", issued: todayISO(), due: daysFromNow(30),
+    projectId: "", project: "", issued: todayISO(), due: daysFromNow(30),
     currency: business.defaultCurrency || "USD",
     method: business.paymentMethods[0] || "",
     items: [{ id: "l1", desc: "", qty: 1, rate: 0 }], notes: "Net 30. Thank you for your business.",
   };
   const [form, setForm] = useState(() => editing
-    ? { clientId: editing.clientId, project: editing.project, issued: editing.issued, due: editing.due, currency: editing.currency || business.defaultCurrency, method: editing.method || business.paymentMethods[0] || "", items: editing.items.map((x) => ({ ...x })), notes: editing.notes }
+    ? { clientId: editing.clientId, projectId: editing.projectId || "", project: editing.project, issued: editing.issued, due: editing.due, currency: editing.currency || business.defaultCurrency, method: editing.method || business.paymentMethods[0] || "", items: editing.items.map((x) => ({ ...x })), notes: editing.notes }
     : blank);
   const [svcPick, setSvcPick] = useState("");
+
+  /* projects for the chosen client first, then the rest */
+  const sortedProjects = [...projects].sort((a, b) => (a.clientId === form.clientId ? -1 : 1) - (b.clientId === form.clientId ? -1 : 1));
+  const onProject = (pid) => {
+    const p = projects.find((x) => x.id === pid);
+    setForm((f) => ({ ...f, projectId: pid, project: p ? p.name : "", currency: p && p.currency ? p.currency : f.currency, clientId: p ? p.clientId : f.clientId }));
+  };
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const setItem = (id, k, v) => setForm((f) => ({ ...f, items: f.items.map((it) => it.id === id ? { ...it, [k]: k === "desc" ? v : Number(v) } : it) }));
@@ -79,7 +86,13 @@ function InvoiceEditorScreen({ onNav, params }) {
                 </select>
               </div>
               <div className="field"><label>Project</label>
-                <input className="input" value={form.project} onChange={(e) => set("project", e.target.value)} placeholder="Website redesign · phase 1" />
+                <select className="input" value={form.projectId} onChange={(e) => onProject(e.target.value)}>
+                  <option value="">— No project —</option>
+                  {sortedProjects.map((p) => {
+                    const pc = clients.find((c) => c.id === p.clientId);
+                    return <option key={p.id} value={p.id}>{p.name}{pc ? " · " + pc.name : ""}</option>;
+                  })}
+                </select>
               </div>
               <div className="field"><label>Issued</label>
                 <input type="date" className="input" value={form.issued} onChange={(e) => set("issued", e.target.value)} />

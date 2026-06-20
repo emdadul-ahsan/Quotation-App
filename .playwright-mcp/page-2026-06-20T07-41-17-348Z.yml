@@ -1,0 +1,177 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]: M
+      - generic [ref=e7]: MyDesk · Invoicing
+    - button "New invoice" [ref=e8] [cursor=pointer]:
+      - img [ref=e9]
+      - text: New invoice
+    - button "Dashboard" [ref=e11] [cursor=pointer]:
+      - img [ref=e12]
+      - text: Dashboard
+    - button "Invoices 6" [ref=e14] [cursor=pointer]:
+      - img [ref=e15]
+      - text: Invoices
+      - generic [ref=e17]: "6"
+    - button "Projects 4" [ref=e18] [cursor=pointer]:
+      - img [ref=e19]
+      - text: Projects
+      - generic [ref=e21]: "4"
+    - button "Clients 5" [ref=e22] [cursor=pointer]:
+      - img [ref=e23]
+      - text: Clients
+      - generic [ref=e25]: "5"
+    - button "Services 6" [ref=e26] [cursor=pointer]:
+      - img [ref=e27]
+      - text: Services
+      - generic [ref=e29]: "6"
+    - button "Settings" [ref=e30] [cursor=pointer]:
+      - img [ref=e31]
+      - text: Settings
+    - generic [ref=e34]:
+      - generic [ref=e35]: G
+      - generic [ref=e36]:
+        - generic [ref=e37]: Guest
+        - generic [ref=e38]: Local guest
+      - button "Sign out" [ref=e39] [cursor=pointer]:
+        - img [ref=e40]
+  - generic [ref=e42]:
+    - generic [ref=e43]:
+      - button "Menu" [ref=e44] [cursor=pointer]:
+        - img [ref=e45]
+      - generic [ref=e47]:
+        - generic [ref=e48] [cursor=pointer]: MyDesk
+        - generic [ref=e49]: /
+        - generic [ref=e50] [cursor=pointer]: Projects
+        - generic [ref=e51]: /
+        - generic [ref=e52]: Website Redesign
+      - generic [ref=e53]:
+        - img [ref=e54]
+        - textbox "Search invoices, clients…" [ref=e56]
+        - generic [ref=e57]: ⌘K
+      - button [ref=e58] [cursor=pointer]:
+        - img [ref=e59]
+    - generic [ref=e61]:
+      - generic [ref=e62]:
+        - generic [ref=e63]:
+          - button [ref=e64] [cursor=pointer]:
+            - img [ref=e65]
+          - generic [ref=e67]:
+            - heading "Website Redesign" [level=1] [ref=e68]
+            - generic [ref=e69]: Acme Co. · USD · valuation $8,000.00
+        - generic [ref=e70]:
+          - button "Generate invoice" [ref=e71] [cursor=pointer]:
+            - img [ref=e72]
+            - text: Generate invoice
+          - button [ref=e75] [cursor=pointer]:
+            - img [ref=e76]
+      - generic [ref=e78]:
+        - generic [ref=e79]:
+          - generic [ref=e80]: Valuation
+          - generic [ref=e81]: $8,000.00
+          - generic [ref=e82]: Contract total
+        - generic [ref=e83]:
+          - generic [ref=e84]: Invoiced
+          - generic [ref=e85]: $5,600.00
+          - generic [ref=e86]: 70% billed
+        - generic [ref=e87]:
+          - generic [ref=e88]: Paid
+          - generic [ref=e89]: $3,000.00
+          - generic [ref=e90]: $2,600.00 outstanding
+        - generic [ref=e91]:
+          - generic [ref=e92]: Remaining to invoice
+          - generic [ref=e93]: $2,400.00
+          - generic [ref=e94]: Left of valuation
+      - generic [ref=e95]:
+        - generic [ref=e96]:
+          - generic [ref=e97]:
+            - generic [ref=e98]:
+              - heading "Billing progress" [level=3] [ref=e99]
+              - generic [ref=e100]: 70% invoiced · 38% paid
+            - generic [ref=e101]:
+              - generic [ref=e102]: Invoiced
+              - generic [ref=e105]: $5,600.00
+            - generic [ref=e106]:
+              - generic [ref=e107]: Paid
+              - generic [ref=e110]: $3,000.00
+            - generic [ref=e111]:
+              - generic [ref=e112]: Remaining
+              - generic [ref=e115]: $2,400.00
+            - button "Bill $2,400.00 remaining" [ref=e116] [cursor=pointer]:
+              - img [ref=e117]
+              - text: Bill $2,400.00 remaining
+          - generic [ref=e119]:
+            - generic [ref=e120]:
+              - heading "Milestones" [level=3] [ref=e121]
+              - generic [ref=e122]: 2/4 done
+            - generic [ref=e123]:
+              - button [ref=e124] [cursor=pointer]:
+                - img [ref=e125]
+              - generic [ref=e127]:
+                - generic [ref=e128]: M1 · Discovery sprint
+                - generic [ref=e129]: Due May 13, 2026
+              - generic [ref=e130]: $1,800.00
+              - generic [ref=e132] [cursor=pointer]: paid
+            - generic [ref=e133]:
+              - button [ref=e134] [cursor=pointer]:
+                - img [ref=e135]
+              - generic [ref=e137]:
+                - generic [ref=e138]: M2 · Wireframes
+                - generic [ref=e139]: Due May 21, 2026
+              - generic [ref=e140]: $1,200.00
+              - generic [ref=e142] [cursor=pointer]: paid
+            - generic [ref=e143]:
+              - button [ref=e144] [cursor=pointer]:
+                - img [ref=e145]
+              - generic [ref=e147]:
+                - generic [ref=e148]: M3 · Visual design
+                - generic [ref=e149]: Due Jun 28, 2026
+              - generic [ref=e150]: $2,600.00
+              - button "Mark done" [ref=e151] [cursor=pointer]
+            - generic [ref=e152]:
+              - button [ref=e153] [cursor=pointer]:
+                - img [ref=e154]
+              - generic [ref=e156]:
+                - generic [ref=e157]: M4 · Build & handoff
+                - generic [ref=e158]: Due Jul 18, 2026
+              - generic [ref=e159]: $2,400.00
+              - button "Mark done" [ref=e160] [cursor=pointer]
+        - generic [ref=e161]:
+          - generic [ref=e162]:
+            - heading "Summary" [level=3] [ref=e164]
+            - generic [ref=e165]:
+              - generic [ref=e166]: Valuation
+              - generic [ref=e167]: $8,000.00
+            - generic [ref=e168]:
+              - generic [ref=e169]: Invoiced
+              - generic [ref=e170]: $5,600.00
+            - generic [ref=e171]:
+              - generic [ref=e172]: Paid
+              - generic [ref=e173]: $3,000.00
+            - generic [ref=e174]:
+              - generic [ref=e175]: Outstanding
+              - generic [ref=e176]: $2,600.00
+            - generic [ref=e177]:
+              - generic [ref=e178]: Remaining to invoice
+              - generic [ref=e179]: $2,400.00
+            - generic [ref=e180]:
+              - generic [ref=e181]: Client
+              - generic [ref=e182]: Acme Co.
+          - generic [ref=e183]:
+            - generic [ref=e184]:
+              - heading "Invoices" [level=3] [ref=e185]
+              - generic [ref=e186]: "2"
+            - generic [ref=e187] [cursor=pointer]:
+              - generic [ref=e188]:
+                - generic [ref=e189]: INV-0141
+                - generic [ref=e190]: May 11
+              - generic [ref=e191]:
+                - generic [ref=e192]: $3,000.00
+                - generic [ref=e193]: paid
+            - generic [ref=e194] [cursor=pointer]:
+              - generic [ref=e195]:
+                - generic [ref=e196]: INV-0146
+                - generic [ref=e197]: Jun 20
+              - generic [ref=e198]:
+                - generic [ref=e199]: $2,600.00
+                - generic [ref=e200]: draft

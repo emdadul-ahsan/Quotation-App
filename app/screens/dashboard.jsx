@@ -3,8 +3,15 @@
    ============================================================ */
 function DashboardScreen({ onNav }) {
   const store = useStore();
-  const { invoices, invoiceTotal, getClient } = store;
+  const { invoices, invoiceTotal, getClient, projects, projectAmounts } = store;
   const t = todayISO();
+
+  const projAgg = projects.reduce((acc, p) => {
+    const a = projectAmounts(p);
+    acc.valuation += a.total; acc.invoiced += a.invoiced; acc.paid += a.paid; acc.remaining += a.remaining;
+    return acc;
+  }, { valuation: 0, invoiced: 0, paid: 0, remaining: 0 });
+  const topProjects = [...projects].sort((a, b) => projectAmounts(b).remaining - projectAmounts(a).remaining).slice(0, 5);
 
   const paid = invoices.filter((i) => i.status === "paid");
   const totalEarned = paid.reduce((s, i) => s + invoiceTotal(i), 0);
@@ -94,6 +101,39 @@ function DashboardScreen({ onNav }) {
             );
           })}
         </div>
+      </div>
+
+      <div className="card mt-24">
+        <div className="card-head">
+          <h3>Projects</h3>
+          <button className="btn ghost sm" onClick={() => onNav("projects")}>View all</button>
+        </div>
+        {projects.length === 0 && <div className="muted small">No projects yet. Create one to track billing against a valuation.</div>}
+        {projects.length > 0 && (
+          <div className="grid grid-4 mb-16">
+            <div><div className="muted tiny">Total valuation</div><div className="semibold mono">{fmtMoney(projAgg.valuation)}</div></div>
+            <div><div className="muted tiny">Invoiced</div><div className="semibold mono">{fmtMoney(projAgg.invoiced)}</div></div>
+            <div><div className="muted tiny">Paid</div><div className="semibold mono ok-text">{fmtMoney(projAgg.paid)}</div></div>
+            <div><div className="muted tiny">Remaining to invoice</div><div className="semibold mono violet-text">{fmtMoney(projAgg.remaining)}</div></div>
+          </div>
+        )}
+        {topProjects.map((p) => {
+          const c = getClient(p.clientId);
+          const a = projectAmounts(p);
+          return (
+            <div key={p.id} className="proj-row" onClick={() => onNav("project-detail", { id: p.id })}>
+              <div className="row gap-12" style={{ minWidth: 0 }}>
+                <Avatar name={c ? c.name : "?"} color={c ? c.color : "#444"} size={28} />
+                <div style={{ minWidth: 0 }}><div className="semibold truncate">{p.name}</div><div className="muted tiny truncate">{c ? c.name : "—"}</div></div>
+              </div>
+              <div className="proj-bar">
+                <div className="progress"><div className="bar" style={{ width: a.pct + "%" }} /></div>
+                <div className="muted tiny mt-4">{fmtMoney(a.invoiced, p.currency)} of {fmtMoney(a.total, p.currency)} · {a.pct}%</div>
+              </div>
+              <div className="right"><div className="semibold mono violet-text">{fmtMoney(a.remaining, p.currency)}</div><div className="muted tiny">remaining</div></div>
+            </div>
+          );
+        })}
       </div>
 
       <div className="card mt-24">
