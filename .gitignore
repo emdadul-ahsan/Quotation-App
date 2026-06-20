@@ -15,3 +15,9 @@ Thumbs.db
 # Env / secrets (Firebase web config is public, but keep this for any future secrets)
 .env
 .env.local
+
+# Playwright MCP artifacts
+.playwright-mcp/
+
+# Local Claude settings
+.claude/
